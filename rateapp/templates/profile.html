@@ -5,6 +5,7 @@
 
 <!-- 
 style="background-image: url({{ profile.profile.profile_pic.cdn_url }}); background-repeat: no-repeat; background-size: cover; background-position: center; filter: blur(5px);" -->
+
 <div class="container ">
   {% if profile_details.profile_pic %}
   <div class="jumbotron burner" style="height: 50%;">
@@ -74,12 +75,11 @@ style="background-image: url({{ profile.profile.profile_pic.cdn_url }}); backgro
       </div>
 
     </div>
-    {% endfor %}
     {% endif %}
+    {% endfor %}
+    
   </div>
 </div>
-
-
-{% endblock %}
+{% endif %}
 
  
