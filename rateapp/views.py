@@ -1,13 +1,27 @@
 from django.shortcuts import render,redirect
+from .forms import UserRegisterForm,UserLoginForm
+from .models import *
+from rateapp import views,forms
+
+from django.contrib.auth import login, views, forms
+from django.contrib.auth.models import User
 from django.http  import HttpResponse,Http404
 from .models import Project,Profile, Review
+from django.contrib.auth import (
+    authenticate,
+    get_user_model,
+    login,
+    logout
+)
+from django.contrib.auth.forms import UserCreationForm
+
 from django.contrib.auth.decorators import login_required
 from .forms import NewProjectForm, ProfileForm, ReviewForm
 from django.contrib.auth.models import User
 from django.db.models import Avg
 
 # Create your views here.
-@login_required(login_url='/accounts/login/')
+
 def index(request):
   projects = Project.get_projects()
   return render(request,'index.html',{"projects":projects})
@@ -47,7 +61,7 @@ def project(request, id):
     form = ReviewForm()
   return render(request, 'profile.html', {'project': project, 'reviews': reviews, 'form': form, 'design': design, 'usability': usability, 'content': content, 'average': average})
 
-@login_required(login_url='/accounts/login/')
+
 def new_project(request):
   current_user = request.user
   if request.method == 'POST':
@@ -62,7 +76,7 @@ def new_project(request):
     form = NewProjectForm()
   return render(request, 'new_project.html', {"form": form})
 
-@login_required(login_url='/accounts/login/')
+
 def profile(request, username):
   title = "Profile"
   profile = User.objects.get(username=username)
@@ -76,7 +90,7 @@ def profile(request, username):
   projects = Project.get_profile_projects(profile.id)
   return render(request, 'profile.html', {'title':title,'profile':profile, 'profile_details':profile_details, 'projects':projects})
 
-@login_required(login_url='/accounts/login/')
+@login_required(login_url='login')
 def edit_profile(request):
   title = 'Edit Profile'
   profile = User.objects.get(username=request.user)
@@ -96,3 +110,40 @@ def edit_profile(request):
     form = ProfileForm()
     
   return render(request, 'editprofile.html', {'form':form, 'profile_details':profile_details})
+
+
+def register_view(request):
+    next = request.GET.get('next')
+    form = UserRegisterForm(request.POST or None)
+    if form.is_valid():
+        user = form.save(commit=False)
+        password = form.cleaned_data.get('password')
+        user.set_password(password)
+        user.save()
+        new_user = authenticate(username=user.username, password=password)
+        login(request, new_user)
+        if next:
+            return redirect(next)
+        return redirect('login')
+    context = {
+        'form': form,
+    }
+    return render(request, "registration/registration_form.html", context)
+
+    
+def login_view(request):
+    next = request.GET.get('next')
+    form = UserLoginForm(request.POST or None)
+    if form.is_valid():
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        login(request, user)
+        if next:
+            return redirect(next)
+        return redirect('index')
+
+    context = {
+        'form': form,
+    }
+    return render(request, "registration/login.html", context)
