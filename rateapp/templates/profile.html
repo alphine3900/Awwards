@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load bootstrap4 %}
 {% load static%}
-
+{% block content %}
 
 <!-- 
 style="background-image: url({{ profile.profile.profile_pic.cdn_url }}); background-repeat: no-repeat; background-size: cover; background-position: center; filter: blur(5px);" -->
@@ -44,7 +44,7 @@ style="background-image: url({{ profile.profile.profile_pic.cdn_url }}); backgro
   <div class="row pt-5 m-auto">
     {% if projects%}
     {% for item in projects %}
-   {{user.username}} 
+   
    
     <div class="col-md-6 col-lg-4 pb-3">
 
@@ -81,6 +81,7 @@ style="background-image: url({{ profile.profile.profile_pic.cdn_url }}); backgro
   </div>
 </div>
 {% endif %}
+{% endblock %}
 <style>
 body {
   font-family: 'Alegreya Sans SC', sans-serif;
